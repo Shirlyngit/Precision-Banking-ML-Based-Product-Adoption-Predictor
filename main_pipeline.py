@@ -134,12 +134,8 @@ evaluate_model("XGBoost", y_test, y_pred_xgb)
 evaluate_model("CatBoost", y_test, y_pred_cat)
 
 
-'''
-# Select best model — CatBoost assumed best here
 best_model = rf
 joblib.dump(best_model, "best_model.pkl")
-'''
-
 
 print("\nComputing SHAP values for Class 1 prediction...")
 
