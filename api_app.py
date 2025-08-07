@@ -23,11 +23,12 @@ class ClientData(BaseModel):
     contact: int
     day: int
     month: int
+    duration: float
     campaign: int
     pdays: int
     previous: int
     poutcome: int
-    duration_days: float
+    
 
 @app.get("/")
 def root():
