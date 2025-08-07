@@ -1,7 +1,7 @@
 # 💼 Precision Banking: ML-Based Product Adoption Forecasting
 
-> *An ML-driven system to predict customer likelihood of subscribing to a bank product — built using the Portuguese Bank Marketing Dataset.*
-
+> *An ML-driven system to predict customer likelihood of subscribing to a telemarketing bank product — built using the Portuguese Bank Marketing Dataset.*
+(Data-driven approach to predict the success of Bank Telemarketing)
 ---
 
 ## 🧠 Introduction
