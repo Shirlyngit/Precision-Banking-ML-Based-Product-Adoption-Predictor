@@ -1,0 +1,43 @@
+name: ML Model CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-train-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install --no-cache-dir -r requirements.txt
+
+      - name: Run Training Pipeline
+        run: |
+          python main_pipeline.py
+
+      - name: Build Docker Image
+        run: |
+          docker build -t precision-banking-app .
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker Image
+        run: |
+          docker tag precision-banking-app ${{ secrets.DOCKER_USERNAME }}/precision-banking-app:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/precision-banking-app:latest
