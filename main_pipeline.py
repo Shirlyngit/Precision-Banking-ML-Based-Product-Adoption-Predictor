@@ -15,6 +15,10 @@ from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
 from imblearn.over_sampling import SMOTE
 
+import mlflow
+import mlflow.sklearn
+from datetime import datetime
+
 import shap
 import joblib
 import warnings
@@ -105,7 +109,41 @@ if imbalance_ratio.min() < 0.4:
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42)
 
-# ---- Models ----
+#mlflow integration
+
+mlflow.set_tracking_uri("file:///app/mlruns")  # local logging inside container
+mlflow.set_experiment("Precision_Banking_Model")
+
+def evaluate_and_log_model(model, name, X_train, y_train, X_test, y_test):
+    """Evaluate model, print metrics, and log to MLflow."""
+    with mlflow.start_run(run_name=f"{name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"):
+        y_pred = model.predict(X_test)
+
+        # Metrics
+        f1 = f1_score(y_test, y_pred)
+        cr = classification_report(y_test, y_pred, output_dict=True)
+
+        print(f"\n{name} Performance:")
+        print(classification_report(y_test, y_pred))
+        print("F1 Score:", f1)
+        print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+
+        # Log params (basic ones here, can add all hyperparams)
+        mlflow.log_param("model_name", name)
+        mlflow.log_param("train_size", len(X_train))
+        mlflow.log_param("test_size", len(X_test))
+
+        # Log metrics
+        mlflow.log_metric("f1_score", f1)
+        mlflow.log_metric("precision", cr["1"]["precision"])
+        mlflow.log_metric("recall", cr["1"]["recall"])
+
+        # Log model
+        mlflow.sklearn.log_model(model, artifact_path="model")
+
+        return f1
+
+# ---- Models training -----
 
 # Random Forest
 rf = RandomForestClassifier(random_state=42)
